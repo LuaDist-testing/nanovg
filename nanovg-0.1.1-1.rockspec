@@ -1,16 +1,16 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "nanovg"
-version = "0.1.0-1"
+version = "0.1.1-1"
 -- LuaDist source
 source = {
-  tag = "0.1.0-1",
+  tag = "0.1.1-1",
   url = "git://github.com/LuaDist-testing/nanovg.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/starwing/lua-nanovg/archive/0.1.0.tar.gz",
---    dir = "lua-nanovg-0.1.0"
+--    url = "https://github.com/starwing/lua-nanovg/archive/0.1.1.tar.gz",
+--    dir = "lua-nanovg-0.1.1"
 -- }
 description = {
    summary = "Lua binding for NanoVG",
@@ -36,7 +36,6 @@ build = {
          sources = {
             "lua-nanovg.c",
             "nanovg/src/nanovg.c",
-            "gl_2_0_core.c",
          },
       },
    },
