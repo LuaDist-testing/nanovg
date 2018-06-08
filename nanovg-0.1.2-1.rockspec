@@ -1,15 +1,15 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "nanovg"
-version = "0.1.2-0"
+version = "0.1.2-1"
 -- LuaDist source
 source = {
-  tag = "0.1.2-0",
+  tag = "0.1.2-1",
   url = "git://github.com/LuaDist-testing/nanovg.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/starwing/lua-nanovg/archive/0.1.2.tar.gz",
+--    url = "https://github.com/starwing/lua-nanovg/releases/download/0.1.2/lua-nanovg-0.1.2.zip",
 --    tag = "0.1.2-0",
 --    dir = "lua-nanovg-0.1.2"
 -- }
