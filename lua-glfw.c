@@ -27,7 +27,15 @@ static int Lpoll(lua_State *L) {
 }
 
 static int Lwait(lua_State *L) {
-    glfwWaitEvents();
+    if (lua_isnoneornil(L, 1))
+        glfwWaitEvents();
+    else
+        glfwWaitEventsTimeout((double)luaL_checknumber(L, 1));
+    return 0;
+}
+
+static int Lpostevent(lua_State *L) {
+    glfwPostEmptyEvent();
     return 0;
 }
 
@@ -78,6 +86,7 @@ static int deinit_glfw(lua_State *L) {
 }
 
 static void init_glfw(lua_State *L) {
+    void *p;
     globalL = L;
     glfwSetErrorCallback(error_cb);
     if (!glfwInit()) {
@@ -87,9 +96,12 @@ static void init_glfw(lua_State *L) {
         lua_concat(L, 2);
         lua_error(L);
     }
-    lua_newuserdata(L, 1);
+    p = lua_newuserdata(L, 1);
     lua_pushcfunction(L, deinit_glfw);
     lbind_setmetafield(L, -2, "__gc");
+    lua_rawsetp(L, LUA_REGISTRYINDEX, p);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 }
 
 static void pushtype_Window(lua_State *L);
@@ -101,6 +113,7 @@ LBLIB_API int luaopen_glfw(lua_State *L) {
         ENTRY(wait),
         ENTRY(time),
         ENTRY(hint),
+        ENTRY(postevent),
         ENTRY(swapinterval),
 #undef  ENTRY
         { NULL, NULL }
@@ -343,6 +356,7 @@ static lbind_EnumItem hints[] = {
     { "accum_green_bits",      GLFW_ACCUM_GREEN_BITS      },
     { "accum_red_bits",        GLFW_ACCUM_RED_BITS        },
     { "alpha_bits",            GLFW_ALPHA_BITS            },
+    { "auto_iconify",          GLFW_AUTO_ICONIFY          },
     { "aux_buffers",           GLFW_AUX_BUFFERS           },
     { "blue_bits",             GLFW_BLUE_BITS             },
     { "client_api",            GLFW_CLIENT_API            },
@@ -383,6 +397,7 @@ static int set_hint(lua_State *L, int hint) {
     case GLFW_SRGB_CAPABLE:
     case GLFW_OPENGL_FORWARD_COMPAT:
     case GLFW_OPENGL_DEBUG_CONTEXT:
+    case GLFW_AUTO_ICONIFY:
         value = lua_toboolean(L, 2);
         break;
     case GLFW_RED_BITS:
@@ -434,7 +449,10 @@ static int set_hint(lua_State *L, int hint) {
     return 0;
 }
 
-/* cc: flags+='-s -O2 -mdll -DLUA_BUILD_AS_DLL'
- * cc: libs+='-lglfw3 -llua53 -lopengl32 -lgdi32'
- * cc: output='glfw.dll' */
+/* win32cc: flags+='-s -O2 -mdll -DLUA_BUILD_AS_DLL -Iglfw/include'
+ * win32cc: libs+='-lglfw3 -llua53 -lopengl32 -lgdi32' output='glfw.dll'
+ * maccc: flags+='-Iglfw/include -O3 -bundle -undefined dynamic_lookup'
+ * maccc: libs+='libglfw3.a -framework OpenGL -framework CoreGraphics '
+ * maccc: libs+='-framework Foundation -framework Cocoa -framework IoKit'
+ * maccc: libs+='-framework CoreVideo' output="glfw.so" */
 
